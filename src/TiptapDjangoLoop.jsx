@@ -1,4 +1,6 @@
+import {useMemo} from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
+import { generateJSON } from '@tiptap/html'
 import Document from '@tiptap/extension-document'
 import Paragraph from '@tiptap/extension-paragraph';
 import Text from '@tiptap/extension-text';
@@ -13,43 +15,57 @@ import TableRow from "@tiptap/extension-table-row";
 import Link from "@tiptap/extension-link";
 import {DjangoWrapper} from "./plugins/djangoWrap";
 
+const html = `{% with obj=person.obj %}
+
+<table>
+  {% for item in items %}
+  <tr>
+    <td>{{item.name}}<td/>
+    <td>{{item.price}}<td/>
+  </tr>
+  {% endfor %}
+</table>
+
+<a href="http://localhost:3000">
+  <img src="https://placehold.co/200x50?text=Unsubscribe" widht="200" height="50" />
+</a>
+
+{% endwith %}`
+
 const TiptapMalformedHtml = () => {
+  const extensions = [
+    Color,
+    DjangoWrapper,
+    Document,
+    Image,
+    Link,
+    Paragraph,
+    Table,
+    TableCell,
+    TableHeader,
+    TableRow,
+    Text,
+    Text,
+    TextStyle,
+    Typography,
+  ];
+
+  const output = generateJSON(html, extensions);
+
   const editor = useEditor({
-    extensions: [
-      Color,
-      DjangoWrapper,
-      Document,
-      Image,
-      Link,
-      Paragraph,
-      Table,
-      TableCell,
-      TableHeader,
-      TableRow,
-      Text,
-      Text,
-      TextStyle,
-      Typography,
-    ],
-    content: `{% with obj=person.obj %}
-
-    <table>
-      {% for item in items %}
-      <tr>
-        <td>{{item.name}}<td/>
-        <td>{{item.price}}<td/>
-      </tr>
-      {% endfor %}
-    </table>
-
-    <a href="{% unsubscribe_link %}">
-      <img src="https://placehold.co/200x50?text=Unsubscribe&param={{ obj|lookup:'prop'|replace_first:'%|@'trim }}" />
-    </a>
-
-    {% endwith %}`,
+    extensions,
+    content: html,
   });
 
-  return <EditorContent editor={editor} />;
+  return (
+    <>
+    <EditorContent editor={editor} />
+    <br/><br/><br/><br/>
+    <pre>
+      <code>{JSON.stringify(output, null, 2)}</code>
+    </pre>
+    </>
+  );
 };
 
 export default TiptapMalformedHtml;

@@ -8,39 +8,30 @@ export const DJANGO_TAG_REGEX = /\{%[ ]*(.*)[^(%})]+%\}/gi;
 const findDjangoTags = (doc) => {
   const decorations = [];
 
+  const makeDecoration = (node, position, tag, color) => {
+    const index = node.text.indexOf(tag)
+    const from = position + index
+    const to = from + tag.length
+    const decoration = Decoration.inline(from, to, {
+      nodeName: 'span',
+      class: 'custom-tag',
+      style: `border: 1px dashed ${color}`,
+    })
+
+    decorations.push(decoration)
+  }
+
   doc.descendants((node, position) => {
     if (!node.text) {
       return
     }
 
-    console.log(node);
-
     Array.from(node.text.matchAll(DJANGO_VARIABLE_REGEX)).forEach(match => {
-      const tag = match[0]
-      const index = match.index || 0
-      const from = position + index
-      const to = from + tag.length
-      const decoration = Decoration.inline(from, to, {
-        nodeName: 'span',
-        class: 'custom-tag',
-        style: `border: 1px dashed blue`,
-      })
-
-      decorations.push(decoration)
+      makeDecoration(node, position, match[0], 'blue')
     })
 
     Array.from(node.text.matchAll(DJANGO_TAG_REGEX)).forEach(match => {
-      const tag = match[0]
-      const index = match.index || 0
-      const from = position + index
-      const to = from + tag.length
-      const decoration = Decoration.inline(from, to, {
-        nodeName: 'span',
-        class: 'custom-tag',
-        style: `border: 1px dashed red`,
-      })
-
-      decorations.push(decoration)
+      makeDecoration(node, position, match[0], 'red')
     })
   })
 
