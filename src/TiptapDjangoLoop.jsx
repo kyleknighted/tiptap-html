@@ -27,7 +27,7 @@ const html = `{% with obj=person.obj %}
 </table>
 
 <a href="https://placehold.co/">
-  <img src="https://placehold.co/200x50?text=Unsubscribe" widht="200" height="50" />
+  <img src="https://placehold.co/200x50?text=Unsubscribe" width="200" height="50" />
 </a>
 
 {% endwith %}`
